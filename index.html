@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InsightFlow — Business Analytics</title>
+<style>
+:root {
+  --site-primary: #173f36;
+  --site-on-primary: #ffffff;
+  --site-secondary: #e4eee8;
+  --site-on-secondary: #173f36;
+  --site-background: #f5f7f4;
+  --site-on-background: #17251f;
+  --site-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-font-heading: Inter, ui-sans-serif, system-ui, sans-serif;
+  --site-heading-scale: 1;
+  --site-spacing-scale: 1;
+  --site-radius-scale: 1;
+  --site-decoration-opacity: 1;
+  --surface: light-dark(#ffffff, #18231e);
+  --surface-soft: light-dark(#f0f4f0, #202d26);
+  --text: light-dark(#17251f, #edf5ef);
+  --muted: light-dark(#718078, #a3b2a8);
+  --line: light-dark(#e5ebe6, #34443a);
+  --green: #28785e;
+  --green-soft: #e7f3ec;
+  --amber: #b77925;
+  --red: #b6534a;
+  color-scheme: light dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--site-background); color: var(--text); font-family: var(--site-font-body); }
+#app { min-height: 100vh; width: 100%; background-color: var(--site-background); color: var(--site-on-background); border-radius: 0; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+.topbar { height: 72px; padding: 0 calc(30px * var(--site-spacing-scale)); display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); background:var(--surface); }
+.brand { display:flex; align-items:center; gap:11px; font-weight:750; letter-spacing:-.5px; color:var(--text); font-size:19px; }
+.brand-mark { width:34px; height:34px; border-radius:11px; display:grid; place-items:center; background:var(--site-primary); color:var(--site-on-primary); }
+.brand-mark svg { width:20px; height:20px; }
+.top-right { display:flex; align-items:center; gap:12px; color:var(--muted); font-size:12px; }
+.status-dot { width:7px; height:7px; background:#3a9a70; border-radius:50%; display:inline-block; margin-right:6px; }
+.avatar { width:34px; height:34px; border-radius:50%; display:grid; place-items:center; background:var(--site-secondary); color:var(--site-on-secondary); font-weight:700; }
+.layout { display:grid; grid-template-columns:220px minmax(0,1fr); min-height:calc(100vh - 72px); }
+aside { padding:26px 15px; border-right:1px solid var(--line); background:var(--surface); }
+.nav-label { padding:0 12px; margin:12px 0 10px; color:var(--muted); font-size:10px; font-weight:750; letter-spacing:1.2px; text-transform:uppercase; }
+.nav-item { width:100%; border:0; background:transparent; color:var(--muted); text-align:left; padding:11px 12px; border-radius:calc(10px * var(--site-radius-scale)); display:flex; align-items:center; gap:11px; font-size:13px; margin:3px 0; }
+.nav-item.active { background:var(--site-secondary); color:var(--site-on-secondary); font-weight:700; }
+.nav-item svg { width:17px; height:17px; }
+.sidebar-note { margin:34px 7px 0; padding:14px; background:var(--surface-soft); border-radius:calc(12px * var(--site-radius-scale)); color:var(--muted); font-size:11px; line-height:1.6; }
+.sidebar-note strong { display:block; color:var(--text); font-size:12px; margin-bottom:4px; }
+main { padding:32px clamp(18px, 3.4vw, 48px) 50px; max-width:1500px; width:100%; margin:0 auto; }
+.page-head { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; margin-bottom:25px; }
+.eyebrow { color:var(--green); font-size:10px; font-weight:800; letter-spacing:1.4px; text-transform:uppercase; margin-bottom:8px; }
+h1 { font-family:var(--site-font-heading); font-size:calc(29px * var(--site-heading-scale)); letter-spacing:-1.1px; line-height:1.1; margin:0; color:var(--text); }
+.subtitle { color:var(--muted); margin:9px 0 0; font-size:13px; }
+.actions { display:flex; gap:9px; align-items:center; flex-wrap:wrap; }
+.btn { border:1px solid var(--line); background:var(--surface); color:var(--text); padding:10px 14px; border-radius:calc(9px * var(--site-radius-scale)); font-size:12px; font-weight:650; display:inline-flex; align-items:center; gap:8px; }
+.btn.primary { background:var(--site-primary); color:var(--site-on-primary); border-color:var(--site-primary); }
+.btn:hover { filter:brightness(.97); transform:translateY(-1px); }
+.btn svg { width:15px; height:15px; }
+#fileInput { display:none; }
+.demo-banner { display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--green-soft); color:#285d48; border:1px solid #d6e9dc; border-radius:calc(10px * var(--site-radius-scale)); padding:10px 14px; margin-bottom:20px; font-size:11px; }
+.demo-banner strong { font-weight:750; }
+.demo-banner button { border:0; background:transparent; color:#285d48; text-decoration:underline; font-size:11px; font-weight:700; }
+.metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:17px; }
+.metric { background:var(--surface); border:1px solid var(--line); border-radius:calc(13px * var(--site-radius-scale)); padding:18px 18px 16px; min-width:0; }
+.metric-top { display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:11px; }
+.metric-icon { width:29px; height:29px; display:grid; place-items:center; background:var(--surface-soft); border-radius:9px; color:var(--green); }
+.metric-icon svg { width:15px; height:15px; }
+.metric-value { font-size:clamp(20px,2.1vw,27px); font-weight:760; letter-spacing:-.9px; margin:14px 0 6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.metric-foot { font-size:10px; color:var(--muted); }
+.metric-foot .positive { color:var(--green); font-weight:700; }
+.panels { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(260px,.9fr); gap:15px; margin-bottom:16px; }
+.panel { background:var(--surface); border:1px solid var(--line); border-radius:calc(13px * var(--site-radius-scale)); padding:19px; min-width:0; }
+.panel-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:15px; }
+.panel-title { font-size:13px; font-weight:750; color:var(--text); }
+.panel-sub { color:var(--muted); font-size:10px; margin-top:5px; }
+.legend { display:flex; gap:12px; font-size:10px; color:var(--muted); }
+.legend span:before { content:""; display:inline-block; width:7px; height:7px; border-radius:2px; background:#28785e; margin-right:5px; }
+.legend span:last-child:before { background:#d7a35d; }
+.chart-wrap { width:100%; height:220px; position:relative; }
+canvas { width:100%; height:100%; display:block; }
+.donut-area { display:flex; align-items:center; justify-content:center; gap:20px; min-height:220px; }
+.donut { width:145px; height:145px; position:relative; flex:0 0 auto; }
+.donut svg { width:100%; height:100%; transform:rotate(-90deg); }
+.donut-center { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; }
+.donut-center strong { font-size:21px; letter-spacing:-.7px; }
+.donut-center small { color:var(--muted); font-size:9px; margin-top:3px; }
+.category-legend { display:grid; gap:12px; min-width:105px; }
+.category-row { display:flex; align-items:center; justify-content:space-between; gap:12px; color:var(--muted); font-size:10px; }
+.category-row b { color:var(--text); font-size:10px; }
+.dot { width:7px; height:7px; display:inline-block; border-radius:2px; margin-right:6px; }
+.lower { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr); gap:15px; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; text-align:left; white-space:nowrap; }
+th { font-size:9px; letter-spacing:.7px; color:var(--muted); text-transform:uppercase; font-weight:750; padding:11px 8px; border-bottom:1px solid var(--line); }
+td { font-size:11px; padding:12px 8px; border-bottom:1px solid var(--line); color:var(--text); }
+tbody tr:last-child td { border-bottom:0; }
+.product-name { font-weight:700; }
+.pill { background:var(--green-soft); color:#286449; padding:4px 7px; border-radius:20px; font-size:9px; font-weight:700; }
+.insights { display:grid; gap:10px; }
+.insight { display:flex; gap:10px; padding:11px; background:var(--surface-soft); border-radius:10px; }
+.insight-icon { width:25px; height:25px; flex:0 0 auto; display:grid; place-items:center; border-radius:8px; background:var(--surface); color:var(--green); font-size:13px; }
+.insight strong { display:block; font-size:11px; margin-bottom:4px; }
+.insight p { color:var(--muted); font-size:10px; line-height:1.5; margin:0; }
+.footer { margin-top:18px; text-align:center; color:var(--muted); font-size:9px; }
+.empty-state { display:none; text-align:center; padding:30px 15px; color:var(--muted); font-size:12px; }
+.toast { position:fixed; bottom:20px; right:20px; background:#173f36; color:white; padding:11px 15px; border-radius:10px; font-size:12px; box-shadow:0 8px 30px #0002; opacity:0; transform:translateY(8px); transition:.2s; pointer-events:none; }
+.toast.show { opacity:1; transform:translateY(0); }
+@media(max-width:1000px) { .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } .panels,.lower { grid-template-columns:1fr; } }
+@media(max-width:650px) { .topbar { padding:0 16px; } .layout { grid-template-columns:1fr; } aside { display:none; } main { padding:24px 15px 35px; } .page-head { flex-direction:column; } .actions { width:100%; } .actions .btn { flex:1; justify-content:center; } .metrics { gap:9px; } .metric { padding:14px; } .metric-value { font-size:21px; } .donut-area { gap:12px; } .donut { width:125px; height:125px; } .demo-banner { align-items:flex-start; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 17V7m5 10V4m5 13v-7m5 7V2"/><path d="M2 20h20"/></svg></div>insightflow</div>
+    <div class="top-right"><span><i class="status-dot"></i>Analytics workspace</span><div class="avatar">IF</div></div>
+  </header>
+  <div class="layout">
+    <aside>
+      <div class="nav-label">Workspace</div>
+      <button class="nav-item active" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="8" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="15" width="7" height="6" rx="1"/></svg>Overview</button>
+      <button class="nav-item" type="button" id="uploadNav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4m-5 5 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg>Import data</button>
+      <div class="nav-label">Insights</div>
+      <button class="nav-item" type="button" id="productsNav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/></svg>Products</button>
+      <button class="nav-item" type="button" id="reportsNav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h8M9 17h8"/></svg>Reports</button>
+      <div class="sidebar-note"><strong>Make data useful.</strong>Turn everyday sales records into clearer business decisions. Import a CSV to explore your own numbers.</div>
+    </aside>
+    <main>
+      <div class="page-head">
+        <div><div class="eyebrow">Business intelligence / Overview</div><h1>Good morning. Here's your business.</h1><p class="subtitle" id="dateLabel">Your performance at a glance.</p></div>
+        <div class="actions"><button class="btn" id="downloadBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m-5-5 5 5 5-5"/><path d="M4 17v4h16v-4"/></svg>Export report</button><button class="btn primary" id="uploadBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4m-5 5 5-5 5 5"/><path d="M4 16v4h16v-4"/></svg>Upload data</button><input id="fileInput" type="file" accept=".csv,text/csv" /></div>
+      </div>
+      <div class="demo-banner" id="demoBanner"><span><strong>Sample workspace</strong> · You're viewing fictional example data. Upload your own CSV to see your business metrics.</span><button id="resetDemo">Reset sample data</button></div>
+      <section class="metrics">
+        <article class="metric"><div class="metric-top">Total revenue <span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17 9 11l4 4 8-9"/><path d="M15 6h6v6"/></svg></span></div><div class="metric-value" id="revenueValue">₹0</div><div class="metric-foot">Gross sales in selected dataset</div></article>
+        <article class="metric"><div class="metric-top">Total costs <span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M6 3h12M6 11h12M8 15h8M10 19h4"/></svg></span></div><div class="metric-value" id="costValue">₹0</div><div class="metric-foot">Recorded product / operating costs</div></article>
+        <article class="metric"><div class="metric-top">Net profit <span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V5m0 14h16M8 15l4-4 3 2 5-7"/></svg></span></div><div class="metric-value" id="profitValue">₹0</div><div class="metric-foot" id="marginFoot">Profit = revenue − costs</div></article>
+        <article class="metric"><div class="metric-top">Units sold <span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 8h14l-1 13H6L5 8Z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg></span></div><div class="metric-value" id="unitsValue">0</div><div class="metric-foot" id="ordersFoot">Across all imported records</div></article>
+      </section>
+      <section class="panels">
+        <article class="panel"><div class="panel-head"><div><div class="panel-title">Revenue & profit trend</div><div class="panel-sub">Monthly totals based on the uploaded records</div></div><div class="legend"><span>Revenue</span><span>Profit</span></div></div><div class="chart-wrap"><canvas id="trendChart" aria-label="Monthly revenue and profit chart"></canvas></div></article>
+        <article class="panel"><div class="panel-head"><div><div class="panel-title">Revenue by product</div><div class="panel-sub">Which products contribute most</div></div></div><div class="donut-area"><div class="donut"><svg viewBox="0 0 120 120" id="donutSvg"><circle cx="60" cy="60" r="46" fill="none" stroke="var(--line)" stroke-width="13"/></svg><div class="donut-center"><strong id="productCount">0</strong><small>products</small></div></div><div class="category-legend" id="productLegend"></div></div></article>
+      </section>
+      <section class="lower">
+        <article class="panel"><div class="panel-head"><div><div class="panel-title">Top-performing products</div><div class="panel-sub">Ranked by total revenue</div></div></div><div class="table-wrap"><table><thead><tr><th>Product</th><th>Units</th><th>Revenue</th><th>Profit</th></tr></thead><tbody id="productTable"></tbody></table></div><div class="empty-state" id="tableEmpty">No product rows found in this dataset.</div></article>
+        <article class="panel"><div class="panel-head"><div><div class="panel-title">Business insights</div><div class="panel-sub">Observations calculated from your data</div></div></div><div class="insights" id="insightsList"></div></article>
+      </section>
+      <div class="footer">InsightFlow · An independent analytics project · Sample figures are illustrative, not real business results.</div>
+    </main>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const sampleRows = [
+ {date:'2026-01-05',product:'Canvas Tote',units:18,revenue:900,cost:450},
+ {date:'2026-01-18',product:'Ceramic Mug',units:24,revenue:1200,cost:600},
+ {date:'2026-02-03',product:'Desk Planner',units:16,revenue:1280,cost:640},
+ {date:'2026-02-21',product:'Canvas Tote',units:25,revenue:1250,cost:625},
+ {date:'2026-03-09',product:'Ceramic Mug',units:31,revenue:1550,cost:775},
+ {date:'2026-03-23',product:'Desk Planner',units:22,revenue:1760,cost:880},
+ {date:'2026-04-02',product:'Canvas Tote',units:29,revenue:1450,cost:725},
+ {date:'2026-04-16',product:'Notebook Set',units:35,revenue:1750,cost:875},
+ {date:'2026-05-07',product:'Ceramic Mug',units:37,revenue:1850,cost:925},
+ {date:'2026-05-22',product:'Desk Planner',units:28,revenue:2240,cost:1120},
+ {date:'2026-06-11',product:'Notebook Set',units:42,revenue:2100,cost:1050},
+ {date:'2026-06-25',product:'Canvas Tote',units:33,revenue:1650,cost:825}
+];
+let rows = sampleRows.map(x=>({...x}));
+let isSample = true;
+const money = n => new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(Number.isFinite(n)?n:0);
+const number = n => new Intl.NumberFormat('en-IN',{maximumFractionDigits:0}).format(n||0);
+const sum = (arr,key) => arr.reduce((a,x)=>a+(Number(x[key])||0),0);
+function toast(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2400)}
+function safeDate(value){const d=new Date(value+'T00:00:00');return Number.isNaN(d.getTime())?null:d}
+function aggregate(){
+ const revenue=sum(rows,'revenue'),cost=sum(rows,'cost'),profit=revenue-cost,units=sum(rows,'units');
+ const products={}; const months={};
+ rows.forEach(r=>{
+  const p=r.product||'Uncategorised'; if(!products[p])products[p]={product:p,units:0,revenue:0,cost:0,profit:0};
+  products[p].units+=r.units;products[p].revenue+=r.revenue;products[p].cost+=r.cost;products[p].profit+=r.revenue-r.cost;
+  const d=safeDate(r.date); const key=d?d.toLocaleString('en-US',{month:'short',year:'2-digit'}):'Unknown date';
+  if(!months[key])months[key]={label:key,sort:d?d.getFullYear()*100+d.getMonth():999999,revenue:0,profit:0};
+  months[key].revenue+=r.revenue;months[key].profit+=r.revenue-r.cost;
+ });
+ return {revenue,cost,profit,units,margin:revenue?profit/revenue*100:0,products:Object.values(products).sort((a,b)=>b.revenue-a.revenue),months:Object.values(months).sort((a,b)=>a.sort-b.sort)};
+}
+function drawTrend(data){
+ const canvas=document.getElementById('trendChart'),rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+ canvas.width=Math.max(1,rect.width*dpr);canvas.height=Math.max(1,rect.height*dpr);
+ const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);const w=rect.width,h=rect.height;
+ const pad={l:43,r:12,t:13,b:32},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+ const vals=data.months.flatMap(m=>[m.revenue,m.profit]);const max=Math.max(1,...vals)*1.15;
+ ctx.font='10px system-ui';ctx.textAlign='right';ctx.textBaseline='middle';
+ for(let i=0;i<=4;i++){const y=pad.t+ch*i/4;ctx.strokeStyle=getComputedStyle(document.body).getPropertyValue('--line').trim()||'#e5ebe6';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();ctx.fillStyle='#829087';ctx.fillText(money(max*(1-i/4)).replace('₹','₹'),pad.l-7,y)}
+ const series=[{key:'revenue',color:'#28785e',width:2.8},{key:'profit',color:'#d7a35d',width:2.4}];
+ series.forEach(s=>{ctx.beginPath();data.months.forEach((m,i)=>{const x=pad.l+(data.months.length===1?cw/2:i*cw/Math.max(1,data.months.length-1)),y=pad.t+ch-(m[s.key]/max)*ch;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.strokeStyle=s.color;ctx.lineWidth=s.width;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();data.months.forEach((m,i)=>{const x=pad.l+(data.months.length===1?cw/2:i*cw/Math.max(1,data.months.length-1)),y=pad.t+ch-(m[s.key]/max)*ch;ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle=s.color;ctx.fill()})});
+ ctx.textAlign='center';ctx.textBaseline='top';ctx.fillStyle='#829087';data.months.forEach((m,i)=>{if(data.months.length>9&&i%2) return;const x=pad.l+(data.months.length===1?cw/2:i*cw/Math.max(1,data.months.length-1));ctx.fillText(m.label,x,h-22)});
+}
+function drawDonut(products,total){
+ const svg=document.getElementById('donutSvg');svg.innerHTML='<circle cx="60" cy="60" r="46" fill="none" stroke="var(--line)" stroke-width="13"/>';
+ const colors=['#28785e','#79a98f','#d7a35d','#8c9cba','#bd806f','#9c8db7'];let offset=0;
+ products.slice(0,6).forEach((p,i)=>{const pct=total?p.revenue/total:0;if(!pct)return;const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('cx','60');c.setAttribute('cy','60');c.setAttribute('r','46');c.setAttribute('fill','none');c.setAttribute('stroke',colors[i%colors.length]);c.setAttribute('stroke-width','13');c.setAttribute('stroke-dasharray',`${pct*289.03} ${289.03-pct*289.03}`);c.setAttribute('stroke-dashoffset',String(-offset));svg.appendChild(c);offset+=pct*289.03});
+ document.getElementById('productCount').textContent=products.length;
+ document.getElementById('productLegend').innerHTML=products.slice(0,4).map((p,i)=>`<div class="category-row"><span><i class="dot" style="background:${colors[i%colors.length]}"></i>${escapeHtml(p.product)}</span><b>${total?(p.revenue/total*100).toFixed(0):0}%</b></div>`).join('')||'<span class="metric-foot">No product data</span>';
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function insights(d){const list=[];const top=d.products[0];if(top)list.push({icon:'↗',title:`${top.product} leads revenue`,body:`It contributes ${d.revenue?(top.revenue/d.revenue*100).toFixed(1):0}% of recorded sales (${money(top.revenue)}). Consider checking stock levels and repeat demand.`});
+ if(d.margin>=0)list.push({icon:'✓',title:`Overall profit margin: ${d.margin.toFixed(1)}%`,body:`Recorded costs account for ${(d.revenue?d.cost/d.revenue*100:0).toFixed(1)}% of revenue. Compare supplier and operating costs to protect this margin.`});else list.push({icon:'!',title:'Costs exceed revenue',body:`The dataset shows a loss of ${money(Math.abs(d.profit))}. Review pricing, costs and any unusual entries before making decisions.`});
+ if(d.products.length>1){const low=d.products[d.products.length-1];list.push({icon:'◎',title:`Review ${low.product}`,body:`This product has the lowest recorded revenue (${money(low.revenue)}). Check whether lower sales reflect limited availability, seasonality or demand.`})}
+ if(d.months.length>1){const a=d.months[d.months.length-2],b=d.months[d.months.length-1],change=a.revenue?(b.revenue-a.revenue)/a.revenue*100:0;list.push({icon:change>=0?'↑':'↘',title:`Latest month ${change>=0?'grew':'declined'} ${Math.abs(change).toFixed(1)}%`,body:`Revenue changed from ${money(a.revenue)} in ${a.label} to ${money(b.revenue)} in ${b.label}. Compare this with promotions, pricing and stock records.`})}
+ document.getElementById('insightsList').innerHTML=list.map(x=>`<div class="insight"><div class="insight-icon">${x.icon}</div><div><strong>${escapeHtml(x.title)}</strong><p>${escapeHtml(x.body)}</p></div></div>`).join('');
+}
+function render(){const d=aggregate();document.getElementById('revenueValue').textContent=money(d.revenue);document.getElementById('costValue').textContent=money(d.cost);document.getElementById('profitValue').textContent=money(d.profit);document.getElementById('unitsValue').textContent=number(d.units);document.getElementById('marginFoot').textContent=`${d.margin.toFixed(1)}% profit margin · Revenue less costs`;document.getElementById('ordersFoot').textContent=`${rows.length} sales records analysed`;
+ document.getElementById('productTable').innerHTML=d.products.slice(0,6).map(p=>`<tr><td class="product-name">${escapeHtml(p.product)}</td><td>${number(p.units)}</td><td>${money(p.revenue)}</td><td><span class="pill">${money(p.profit)}</span></td></tr>`).join('');document.getElementById('tableEmpty').style.display=d.products.length?'none':'block';drawTrend(d);drawDonut(d.products,d.revenue);insights(d);
+ document.getElementById('demoBanner').style.display=isSample?'flex':'none';document.getElementById('dateLabel').textContent=isSample?'Explore an illustrative sample dataset. Upload a CSV to analyse your own business.':`Analysing ${rows.length} records from your uploaded CSV.`;
+}
+function parseCSV(text){const out=[];let row=[],cell='',quoted=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'&&quoted&&n==='"'){cell+='"';i++}else if(c==='"'){quoted=!quoted}else if(c===','&&!quoted){row.push(cell.trim());cell=''}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&n==='\n')i++;row.push(cell.trim());if(row.some(v=>v!==''))out.push(row);row=[];cell=''}else cell+=c}row.push(cell.trim());if(row.some(v=>v!==''))out.push(row);if(out.length<2)throw new Error('The CSV needs a header row and at least one data row.');const headers=out[0].map(h=>h.toLowerCase().trim());const find=names=>headers.findIndex(h=>names.includes(h));const ix={date:find(['date','order date','sale date']),product:find(['product','product name','item','item name']),units:find(['units','quantity','qty','units sold']),revenue:find(['revenue','sales','total sales','amount','selling price']),cost:find(['cost','total cost','expenses','expense','cogs'])};const missing=Object.keys(ix).filter(k=>ix[k]<0);if(missing.length)throw new Error('Missing columns: '+missing.join(', ')+'. Required headers: date, product, units, revenue, cost.');return out.slice(1).map((r,i)=>{const num=k=>{const v=Number(String(r[ix[k]]||'').replace(/[₹$,\s]/g,''));return Number.isFinite(v)?v:NaN};const date=r[ix.date],product=r[ix.product];const units=num('units'),revenue=num('revenue'),cost=num('cost');if(!date||!product||![units,revenue,cost].every(Number.isFinite)||units<0||revenue<0||cost<0)throw new Error(`Invalid or missing value on CSV row ${i+2}. Check date, product, units, revenue and cost.`);return {date,product,units,revenue,cost}})}
+function uploadFile(file){if(!file)return;if(!file.name.toLowerCase().endsWith('.csv')){toast('Please upload a CSV file.');return}const reader=new FileReader();reader.onload=()=>{try{const parsed=parseCSV(String(reader.result));if(!parsed.length)throw new Error('No valid sales records found.');rows=parsed;isSample=false;render();toast(`Imported ${parsed.length} sales records successfully.`)}catch(e){toast(e.message)}};reader.onerror=()=>toast('Could not read this file. Try another CSV.');reader.readAsText(file)}
+function downloadReport(){const d=aggregate();const lines=[['InsightFlow business report'],['Metric','Value'],['Revenue',d.revenue],['Costs',d.cost],['Profit',d.profit],['Profit margin (%)',d.margin.toFixed(2)],['Units sold',d.units],[],['Product','Units','Revenue','Cost','Profit'],...d.products.map(p=>[p.product,p.units,p.revenue,p.cost,p.profit])];const csv=lines.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='insightflow-business-report.csv';a.click();URL.revokeObjectURL(url);toast('Your report has been exported.')}
+document.getElementById('uploadBtn').addEventListener('click',()=>document.getElementById('fileInput').click());document.getElementById('uploadNav').addEventListener('click',()=>document.getElementById('fileInput').click());document.getElementById('fileInput').addEventListener('change',e=>{uploadFile(e.target.files[0]);e.target.value=''});document.getElementById('downloadBtn').addEventListener('click',downloadReport);document.getElementById('resetDemo').addEventListener('click',()=>{rows=sampleRows.map(x=>({...x}));isSample=true;render();toast('Sample data restored.')});document.getElementById('productsNav').addEventListener('click',()=>document.querySelector('.lower').scrollIntoView({behavior:'smooth'}));document.getElementById('reportsNav').addEventListener('click',downloadReport);window.addEventListener('resize',()=>drawTrend(aggregate()));
+const today=new Date();document.getElementById('dateLabel').textContent='Explore an illustrative sample dataset.';render();
+</script>
+</body>
+</html>
